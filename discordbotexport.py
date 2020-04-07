@@ -8,6 +8,7 @@ import requests
 from discord.ext import commands
 import imgkit
 import matplotlib
+import json
 
 #Dominant color
 import numpy
@@ -18,27 +19,28 @@ import scipy.cluster
 import binascii
 import struct
 
-weather_api = 'http://api.openweathermap.org/data/2.5/weather?appid=APIKEY'
-coronavirus_api = 'https://api.covid19api.com/summary' #not set up
+#Nutritionix
+from nutritionix import Nutritionix
+
+coronavirus_api = 'https://api.covid19api.com/summary'
+nutrition_api = 'https://api.nutritionix.com/v1_1/search/'
 bot = commands.Bot(command_prefix = '!')
 
 @bot.event #Bot ready, presence
 async def on_ready():
     print('Bot is ready yo.')
     await bot.change_presence(activity=discord.Game(name='(!) god'))
-    channel = bot.get_channel(CHANNELID)
     await channel.send('The bot is ready')
 
 @bot.event #Welcome
 async def on_member_join(member):
     print(f'{member} joined')
-    channel = bot.get_channel(CHANNELID)
     await channel.send(f'Welcome to the server, **@{member}**!')
 
 @bot.event #Goodbye
 async def on_member_remove(member):
     print(f'{member} left')
-    channel = bot.get_channel(CHANNELID)
+    channel = bot.get_channel(693871505783914537)
     await channel.send(f'Goodbye, **@{member}**!')
 
 @bot.command() #Ping
@@ -47,12 +49,10 @@ async def ping(ctx):
 
 @bot.command() #Calc Help
 async def calchelp(ctx):
-    await ctx.send('Format: !calc Operation|First Number|Second Number (Key: 1 for addition, 2 for subtraction, 3 for multiplication, 4 for division)') #outdated
+    await ctx.send('Format: !calc Operation|First Number|Second Number (Key: 1 for addition, 2 for subtraction, 3 for multiplication, 4 for division)')
 
 @bot.command()
 async def dm(ctx):
-    channel = bot.get_member(USERID)
-    await channel.send(USERID, "test")
 
 @bot.command() #Calculator
 async def calc(ctx,num1,option,num2):
@@ -112,7 +112,6 @@ async def corona(ctx):
 @bot.command()
 @commands.is_owner()
 async def shutdown(ctx):
-    channel = bot.get_channel(CHANNELID)
     await channel.send('Shutting down.')
     print ('Bot is done yo.')
     await ctx.bot.logout()
@@ -217,4 +216,34 @@ async def profile(ctx, member: discord.Member = None):
     await ctx.send(file=File('/home/ubuntu/cache/imgkit.png'))
     await message.delete()
 
-bot.run(BOTKEY)
+@bot.command()
+async def nutrient(ctx,query):
+    search = nix.search(query)
+    results = search.json()
+
+    #id = results["hits"][0]["_id"]
+
+    final = nix.item(id=results["hits"][0]["_id"]).json()
+    
+    embed=discord.Embed(title=(query.lower()).title(), color=0xffc300)
+    embed.add_field(name="**Calories**", value=final["nf_calories"], inline=True)
+    embed.add_field(name="**Total fat**", value=final["nf_total_fat"], inline=True)
+    embed.add_field(name="Saturated Fat", value=final["nf_saturated_fat"], inline=True)
+    embed.add_field(name="Trans fatty acid", value=final["nf_trans_fatty_acid"], inline=True)
+    embed.add_field(name="Polyunsaturated fat", value=final["nf_polyunsaturated_fat"], inline=True)
+    embed.add_field(name="Monounsaturated fat", value=final["nf_monounsaturated_fat"], inline=True)
+    embed.add_field(name="**Cholestrol**", value=final["nf_cholesterol"], inline=True)
+    embed.add_field(name="Sodium", value=final["nf_sodium"], inline=True)
+    embed.add_field(name="Total carbohydrates", value=final["nf_total_carbohydrate"], inline=True)
+    embed.add_field(name="Dietary fiber", value=final["nf_dietary_fiber"], inline=True)
+    embed.add_field(name="Sugars", value=final["nf_sugars"], inline=True)
+    embed.add_field(name="Protein", value=final["nf_protein"], inline=True)
+    embed.add_field(name="Vitamin A", value=final["nf_vitamin_a_dv"], inline=True)
+    embed.add_field(name="Vitamin C", value=final["nf_vitamin_c_dv"], inline=True)
+    embed.add_field(name="Iron", value=final["nf_iron_dv"], inline=True)
+    embed.set_footer(text="Data pulled from Nutritionix API")
+    await ctx.send(embed=embed)
+
+    with open('/home/ubuntu/cache/results.json','w') as data:
+        json.dump(final,data,indent=1)
+
