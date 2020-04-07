@@ -10,6 +10,7 @@ List of packages:
 6. numpy
 7. scipy
 8. binascii
+9. nutritionix
 
 Stuff it can do:
 1. OCR images
