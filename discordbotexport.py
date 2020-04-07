@@ -23,6 +23,7 @@ import struct
 from nutritionix import Nutritionix
 nix = Nutritionix(app_id="c2d92f36",api_key="457db45984954e77bc02e5ee0b9ee1e8")
 
+weather_api = 'http://api.openweathermap.org/data/2.5/weather?appid=27e72a5a2553c2aadde0508dd4487833&q='
 coronavirus_api = 'https://api.covid19api.com/summary'
 nutrition_api = 'https://api.nutritionix.com/v1_1/search/'
 bot = commands.Bot(command_prefix = '!')
@@ -253,3 +254,4 @@ async def nutrient(ctx,query):
     with open('/home/ubuntu/cache/results.json','w') as data:
         json.dump(final,data,indent=1)
 
+bot.run('NjkzMTA5MzI2NzM4NDg5NDI0.Xn8zig.sBB6O6V4qFpvQ7pYPmdMU0pjSAA')
