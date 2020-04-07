@@ -21,6 +21,7 @@ import struct
 
 #Nutritionix
 from nutritionix import Nutritionix
+nix = Nutritionix(app_id="c2d92f36",api_key="457db45984954e77bc02e5ee0b9ee1e8")
 
 coronavirus_api = 'https://api.covid19api.com/summary'
 nutrition_api = 'https://api.nutritionix.com/v1_1/search/'
@@ -30,11 +31,13 @@ bot = commands.Bot(command_prefix = '!')
 async def on_ready():
     print('Bot is ready yo.')
     await bot.change_presence(activity=discord.Game(name='(!) god'))
+    channel = bot.get_channel(693871505783914537)
     await channel.send('The bot is ready')
 
 @bot.event #Welcome
 async def on_member_join(member):
     print(f'{member} joined')
+    channel = bot.get_channel(693871505783914537)
     await channel.send(f'Welcome to the server, **@{member}**!')
 
 @bot.event #Goodbye
@@ -53,6 +56,8 @@ async def calchelp(ctx):
 
 @bot.command()
 async def dm(ctx):
+    channel = bot.get_member(305784264140652554)
+    await channel.send(305784264140652554, "test")
 
 @bot.command() #Calculator
 async def calc(ctx,num1,option,num2):
@@ -112,6 +117,7 @@ async def corona(ctx):
 @bot.command()
 @commands.is_owner()
 async def shutdown(ctx):
+    channel = bot.get_channel(693871505783914537)
     await channel.send('Shutting down.')
     print ('Bot is done yo.')
     await ctx.bot.logout()
